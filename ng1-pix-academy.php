@@ -28,6 +28,8 @@ class NG1_Pix_Academy {
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_scripts' ] );
         // Nettoyage des anciennes options (ex: visible_videos)
         add_action( 'admin_init', [ $this, 'cleanup_deprecated_options' ] );
+        // Shortcode front pour afficher l'interface de la page admin
+        add_action( 'init', [ $this, 'register_shortcodes' ] );
     }
 
     /**
@@ -162,6 +164,65 @@ public function render_videos_page() {
             'diffuseur_slug' => $diffuseur_slug,
             'nonce'          => wp_create_nonce('wp_rest')
         ]);
+    }
+
+    /**
+     * Déclare les shortcodes publics du plugin.
+     */
+    public function register_shortcodes() {
+        add_shortcode( 'pix_academy', [ $this, 'shortcode_render_admin_ui' ] );
+    }
+
+    /**
+     * Rendu du shortcode [pix_academy]: affiche l'UI de la page admin sur le front.
+     */
+    public function shortcode_render_admin_ui( $atts = [] ) {
+        // Attributs de surcharge: api_url et slug
+        $atts = shortcode_atts([
+            'api_url' => '',
+            'slug'    => '',
+        ], (array) $atts, 'pix_academy');
+        // Charger les mêmes assets que l'admin
+        wp_enqueue_style( 'ng1-admin-styles', plugin_dir_url( __FILE__ ) . 'admin/css/admin-styles.css', [], '1.0.0' );
+        wp_enqueue_script( 'ng1-admin-scripts', plugin_dir_url( __FILE__ ) . 'admin/js/admin-scripts.js', [], '1.0.0', true );
+
+        // Résoudre config: atts > options enregistrées
+        $options = get_option( 'ng1_pix_academy_options' );
+        $api_url_src = trim( (string) ( $atts['api_url'] ?: ( $options['api_url'] ?? '' ) ) );
+        $slug_src    = trim( (string) ( $atts['slug']    ?: ( $options['diffuseur_slug'] ?? '' ) ) );
+
+        $api_url = $api_url_src !== '' ? trailingslashit( esc_url( $api_url_src ) ) : '';
+        $diffuseur_slug = $slug_src !== '' ? sanitize_title( $slug_src ) : '';
+        wp_localize_script('ng1-admin-scripts', 'ng1_pix_academy_data', [
+            'api_url'        => $api_url,
+            'diffuseur_slug' => $diffuseur_slug,
+            'nonce'          => wp_create_nonce('wp_rest')
+        ]);
+
+        ob_start();
+        ?>
+        <div class="ng1-pix-academy-shortcode" id="ng1-pix-academy-app">
+            <h2>Pix Academie</h2>
+            <div id="ng1-tag-filters-container" class="ng1-tag-filters">
+                <p>Chargement des filtres...</p>
+            </div>
+            <div id="ng1-video-container" class="ng1-video-grid">
+                <p class="ng1-loading">Chargement des vidéos...</p>
+            </div>
+
+            <div id="ng1-modal" class="ng1-modal-overlay">
+                <div class="ng1-modal-content">
+                    <button class="ng1-modal-close" aria-label="Fermer">&times;</button>
+                    <h2 id="ng1-modal-title"></h2>
+                    <div id="ng1-modal-body">
+                        <div id="ng1-modal-video"></div>
+                        <div id="ng1-modal-description"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php
+        return ob_get_clean();
     }
 
     /**
