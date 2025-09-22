@@ -26,6 +26,8 @@ class NG1_Pix_Academy {
         add_action( 'admin_menu', [ $this, 'add_admin_pages' ] );
         add_action( 'admin_init', [ $this, 'register_settings' ] );
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_scripts' ] );
+        // Nettoyage des anciennes options (ex: visible_videos)
+        add_action( 'admin_init', [ $this, 'cleanup_deprecated_options' ] );
     }
 
     /**
@@ -160,6 +162,17 @@ public function render_videos_page() {
             'diffuseur_slug' => $diffuseur_slug,
             'nonce'          => wp_create_nonce('wp_rest')
         ]);
+    }
+
+    /**
+     * Supprime proprement les anciennes options dépréciées.
+     */
+    public function cleanup_deprecated_options() {
+        $options = get_option( 'ng1_pix_academy_options' );
+        if ( is_array( $options ) && array_key_exists( 'visible_videos', $options ) ) {
+            unset( $options['visible_videos'] );
+            update_option( 'ng1_pix_academy_options', $options );
+        }
     }
 }
 

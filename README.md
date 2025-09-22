@@ -53,6 +53,7 @@ Mise à jour: pour mettre à jour le plugin, remplacez les fichiers (ou utilisez
 
 - À adapter: décrire les pages d’options du plugin, les clés API à renseigner, les capacités utilisateurs nécessaires, etc.
 - Si une clé API ou un secret est requis, ne le versionnez pas. Utilisez un fichier `.env` (déjà ignoré via `.gitignore`) ou la configuration serveur.
+- Il n’existe plus d’option de visibilité par vidéo dans les réglages: toutes les vidéos renvoyées par l’API (ou par le slug du diffuseur configuré) sont affichées dans l’interface d’administration.
 
 ## Utilisation
 
