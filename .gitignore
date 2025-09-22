@@ -1,0 +1,75 @@
+# ============================
+# Gitignore for WP Plugin: ng1-pix-academy
+# ============================
+
+# OS / System
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+# Node / Frontend
+node_modules/
+.npm/
+.pnpm-store/
+.yarn/
+.yarnrc.yml
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+
+# Build artefacts
+build/
+dist/
+cache/
+.cache/
+.parcel-cache/
+coverage/
+.eslintcache
+*.map
+
+# PHP / Composer
+vendor/
+composer.phar
+# Keep composer.lock if you prefer to lock dependencies at the project level
+# (uncomment next line to ignore)
+# composer.lock
+
+# PHP tooling caches
+.php-cs-fixer.cache
+.phpunit.result.cache
+.phpactor/
+.psalm/
+.php-stubs/
+.phpstan/
+.phpstan.cache
+
+# Env files / Secrets
+.env
+.env.*
+
+# IDE / Editors
+.vscode/
+.idea/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Archives / Exports
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+
+# Images/source caches (if any pre-processors are used)
+.sass-cache/
+.scss-cache/
+
+# Misc
+logs/
+*.log
+.svn/
