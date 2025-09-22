@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Variables d'état ---
     let allFetchedVideos = []; // Stocke toutes les vidéos pour un accès rapide
-    const { api_url, visible_videos, diffuseur_slug } = ng1_pix_academy_data;
+    const { api_url, diffuseur_slug } = ng1_pix_academy_data;
 
     // --- Vérification initiale ---
     if (!api_url) {
@@ -52,12 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     const displayVideos = (videos) => {
         videoContainer.innerHTML = '';
-        const allowedVideos = (Array.isArray(visible_videos) && visible_videos.length > 0)
-            ? videos.filter(video => visible_videos.includes(String(video.id)))
-            : videos;
+        const allowedVideos = videos;
 
-        if (allowedVideos.length === 0) {
-            videoContainer.innerHTML = `<div class="ng1-notice">Aucune vidéo à afficher. Vérifiez vos réglages de visibilité dans Pix Academie → Réglages API.</div>`;
+        if (!Array.isArray(allowedVideos) || allowedVideos.length === 0) {
+            videoContainer.innerHTML = `<div class="ng1-notice">Aucune vidéo à afficher.</div>`;
             return;
         }
 

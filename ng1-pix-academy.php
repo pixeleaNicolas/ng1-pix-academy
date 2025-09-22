@@ -73,7 +73,6 @@ class NG1_Pix_Academy {
         $options = get_option( 'ng1_pix_academy_options' );
         $api_url = isset( $options['api_url'] ) ? esc_url( $options['api_url'] ) : '';
         $diffuseur_slug = isset( $options['diffuseur_slug'] ) ? sanitize_title( $options['diffuseur_slug'] ) : '';
-        $visible_videos = isset( $options['visible_videos'] ) ? (array) $options['visible_videos'] : [];
         ?>
         <div class="wrap">
             <h1>Réglages de l'API Pix Academy</h1>
@@ -99,54 +98,6 @@ class NG1_Pix_Academy {
                         </td>
                     </tr>
                 </table>
-                
-                <?php
-                if (is_user_logged_in()) {
-                    $current_user = wp_get_current_user();
-                    $user_email = $current_user->user_email;
-                    
-                    // Vérifier si l'email contient "@pixelea"
-                    if (strpos($user_email, '@pixelea') !== false) {
-                  
-                        ?>
-                        <hr>
-                        <h2>Visibilité des vidéos</h2>
-                        <p>Cochez les vidéos que vous souhaitez rendre accessibles dans l'interface.</p>
-    
-                        <?php
-                        if ( ! empty( $api_url ) && ! empty( $diffuseur_slug ) ) {
-                            $request_url = trailingslashit( $api_url ) . 'wp-json/ng1-video-sharing-api/v1/videos/by-user/' . rawurlencode( $diffuseur_slug ) . '?per_page=100';
-                            $response = wp_remote_get( $request_url );
-    
-                            if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
-                                $videos = json_decode( wp_remote_retrieve_body( $response ) );
-                                if ( ! empty( $videos ) ) {
-                                    echo '<table class="wp-list-table widefat striped"><thead><tr><th style="width: 50px;">Activer</th><th>Titre de la vidéo</th></tr></thead><tbody>';
-                                    foreach ( $videos as $video ) {
-                                        $checked = in_array( $video->id, $visible_videos ) ? 'checked' : '';
-                                        echo '<tr>';
-                                        echo '<td><input type="checkbox" name="ng1_pix_academy_options[visible_videos][]" value="' . esc_attr( $video->id ) . '" ' . $checked . '></td>';
-                                        echo '<td>' . esc_html( $video->title->rendered ) . '</td>';
-                                        echo '</tr>';
-                                    }
-                                    echo '</tbody></table>';
-                                } else {
-                                    echo '<p>Aucune vidéo trouvée sur l\'API.</p>';
-                                }
-                            } else {
-                                 echo '<div class="notice notice-error"><p>Impossible de se connecter à l\'API. Vérifiez l\'URL et que le plugin "Video Sharing API" est actif sur le site distant.</p></div>';
-                            }
-                        } else {
-                             echo '<div class="notice notice-warning"><p>Veuillez d\'abord enregistrer une URL d\'API valide et un slug de diffuseur pour voir la liste des vidéos.</p></div>';
-                        }
-                    } else {
-                        // L'email ne contient pas "@pixelea"
-                        echo '<div class="notice notice-error"><p>Cette section est réservée aux administrateur de Pixelea.</p></div>';
-                    }
-                } else {
-                    echo '<div class="notice notice-warning"><p>Veuillez vous connecter pour accéder aux réglages.</p></div>';
-                }
-                ?>
                 <?php submit_button(); ?>
             </form>
         </div>
@@ -202,12 +153,10 @@ public function render_videos_page() {
         // Passer les données de PHP à JavaScript
         $options = get_option( 'ng1_pix_academy_options' );
         $api_url = isset( $options['api_url'] ) ? trailingslashit( esc_url( $options['api_url'] ) ) : '';
-        $visible_videos = isset( $options['visible_videos'] ) ? (array) $options['visible_videos'] : [];
         $diffuseur_slug = isset( $options['diffuseur_slug'] ) ? sanitize_title( $options['diffuseur_slug'] ) : '';
 
         wp_localize_script('ng1-admin-scripts', 'ng1_pix_academy_data', [
             'api_url'        => $api_url,
-            'visible_videos' => $visible_videos,
             'diffuseur_slug' => $diffuseur_slug,
             'nonce'          => wp_create_nonce('wp_rest')
         ]);
